@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link type="text/css" rel="stylesheet" href="css/custom.css"  media="screen,projection"/>
+        <style>
+        .input-field {margin-top:4px;}
+        #note span {color:#d5022a;display:block;}
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta charset="utf-8"/>
+        <script>
+        function getSecret() {
+           return Math.random().toString(36).slice(-7);
+        }
+        function getValues() {
+            domain = document.getElementById("domain").value;
+            alias = document.getElementById("alias").value;
+            ip = document.getElementById("ip").value;
+            sslcert = document.getElementById("sslcert").value;
+            sslkey = document.getElementById("sslkey").value;
+            panel = document.getElementById("panel").value;
+        }
+        function generateConfig() {
+            getValues();
+            secret=getSecret()+getSecret();
+            if (domain && ip && sslcert && sslkey && panel) {
+                if (domain && alias) {
+                    var server_name=domain+" "+alias;
+                }
+                else {
+                    var server_name=domain;
+                }
+                if (panel == "billmgr") {
+                    var apiv2 = "  location ^~ /api2/{\r\n\
+   proxy_pass $mgr_proxy;\r\n\
+   proxy_redirect $mgr_proxy /;\r\n\
+   proxy_set_header Host $host:$server_port;\r\n\
+   proxy_set_header X-Forwarded-For $remote_addr;\r\n\
+   proxy_set_header X-Forwarded-Proto $scheme;\r\n\
+   proxy_set_header X-Real-IP $remote_addr;\r\n\
+   proxy_set_header X-Forwarded-Secret "+secret+";\r\n\
+   chunked_transfer_encoding off;\r\n\
+  }\r\n\
+}";
+                }
+                else {
+                    var apiv2 = "}";
+                }
+                var config = "server {\r\n\
+  server_name "+server_name+";\r\n\
+  listen "+ip+":80;\r\n\
+  return 301 https://$host:443$request_uri;\r\n\
+}\r\n\
+server {\r\n\
+  server_name "+server_name+";\r\n\
+  ssl on;\r\n\
+  ssl_certificate \""+sslcert+"\";\r\n\
+  ssl_certificate_key \""+sslkey+"\";\r\n\
+  ssl_ciphers EECDH:+AES256:-3DES:RSA+AES:!NULL:!RC4;\r\n\
+  ssl_prefer_server_ciphers on;\r\n\
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;\r\n\
+  ssl_dhparam /etc/ssl/certs/dhparam4096.pem;\r\n\
+  charset off;\r\n\
+  index index.php index.html;\r\n\
+  listen "+ip+":443;\r\n\
+  set $mgr_proxy \"https://"+ip+":1500\";\r\n\
+  location ^~ /manimg/ {\r\n\
+   alias /usr/local/mgr5/skins/;\r\n\
+  }\r\n\
+  location / {\r\n\
+   proxy_pass $mgr_proxy/"+panel+";\r\n\
+   proxy_redirect $mgr_proxy /;\r\n\
+   proxy_set_header Host $host:$server_port;\r\n\
+   proxy_set_header X-Forwarded-For $remote_addr;\r\n\
+   proxy_set_header X-Forwarded-Proto $scheme;\r\n\
+   proxy_set_header X-Real-IP $remote_addr;\r\n\
+   proxy_set_header X-Forwarded-Secret "+secret+";\r\n\
+   chunked_transfer_encoding off;\r\n\
+  }\r\n\
+  location /"+panel+" {\r\n\
+   proxy_pass $mgr_proxy;\r\n\
+   proxy_redirect $mgr_proxy /;\r\n\
+   proxy_set_header Host $host:$server_port;\r\n\
+   proxy_set_header X-Forwarded-For $remote_addr;\r\n\
+   proxy_set_header X-Forwarded-Proto $scheme;\r\n\
+   proxy_set_header X-Real-IP $remote_addr;\r\n\
+   proxy_set_header X-Forwarded-Secret "+secret+";\r\n\
+   chunked_transfer_encoding off;\r\n\
+  }\r\n\
+  location ^~ /mancgi/ {\r\n\
+   proxy_pass $mgr_proxy;\r\n\
+   proxy_redirect $mgr_proxy /;\r\n\
+   proxy_set_header Host $host:$server_port;\r\n\
+   proxy_set_header X-Forwarded-For $remote_addr;\r\n\
+   proxy_set_header X-Forwarded-Proto $scheme;\r\n\
+   proxy_set_header X-Real-IP $remote_addr;\r\n\
+   proxy_set_header X-Forwarded-Secret "+secret+";\r\n\
+   chunked_transfer_encoding off;\r\n\
+  }\r\n\
+"+apiv2;
+                document.getElementById("config").innerHTML = config;
+                document.getElementById("note").innerHTML = "Не забудь добавить <span>ForwardedSecret "+secret+"</span> в конфиг <span>/usr/local/mgr5/etc/"+panel+".conf</span> и перезапустить панель.";
+            }
+            else {
+                document.getElementById("config").innerHTML = "Заполнены не все обязательные поля";
+            }
+        }
+        function copyToClipboard() {
+            var elm = document.getElementById("config");
+            var selection = window.getSelection();
+            var range = document.createRange();
+            range.selectNodeContents(elm);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            document.execCommand("Copy");
+        }
+        </script>
+    </head>
+    <body>
+        <nav class="teal lighten-5">
+            <div class="nav-wrapper valign-wrapper">
+                <a href="#" style="position:relative;left:15px;"><img src="logo.svg" style="display: block;height: 30px;width: 155px;"/></a>
+            </div>
+        </nav>
+        <div class="row">
+           <div class="col s4">
+                <div class="row">
+                    <form class="col s12" onsubmit="event.preventDefault();">
+                        <div class="row" style="margin-top:18px;">
+                            <div class="input-field col s12">
+                                <input id="domain" name="domain" type="text" placeholder="isp.example.com" class="validate" required>
+                                <label for="domain" class="">Домен*</label>
+                            </div>    
+                            <div class="input-field col s12">
+                                <input id="alias" name="alias" type="text" placeholder="www.isp.example.com www.isp.example.ru etc..." class="validate">
+                                <label for="alias" class="">Псевдонимы</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="ip" name="ip" type="text" placeholder="1.1.1.1" class="validate" required>
+                                <label for="ip" class="">IP*</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="sslcert" name="sslcert" type="text" placeholder="/var/www/httpd-cert/www-root/isp.example.com.crtca" class="validate" required>
+                                <label for="sslcert" class="">Путь до SSL сертификата*</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="sslkey" name="sslkey" type="text" placeholder="/var/www/httpd-cert/www-root/isp.example.com.key" class="validate" required>
+                                <label for="sslkey" class="">Путь до ключа SSL сертификата*</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <select id="panel">
+                                    <option value="ispmgr">ISPmanager Lite</option>
+                                    <option value="billmgr">BILLmanager</option>
+                                    <option value="ipmgr">IPmanager</option>
+                                    <option value="dnsmgr">DNSmanager</option>
+                                </select>
+                                <label>Панель управления*</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <button class="waves-effect waves-light btn" onclick="generateConfig()" id="generate">Генерировать
+                                <i class="material-icons right">send</i>
+                                </button>
+                                <button class="waves-effect waves-light btn" onclick="copyToClipboard()" id="copy">Копировать
+                                <i class="material-icons right">content_copy</i>
+                                </button>
+                            </div>
+                            <div class="input-field col s12">
+                                <p id="note"></p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col s8">
+                <pre><code class="nginx" id="config">Тут будет сгенерирован конфиг</code></pre>
+            </div>
+        </div>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.collapsible');
+            var instances = M.Collapsible.init(elems, {accordion: false});
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('select');
+            var instances = M.FormSelect.init(elems);
+        });
+    </script>
+    </body>
+</html>
