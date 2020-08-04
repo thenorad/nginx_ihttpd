@@ -101,10 +101,10 @@ server {\r\n\
   }\r\n\
 "+apiv2;
                 document.getElementById("config").innerHTML = config;
-                document.getElementById("note").innerHTML = "Не забудь добавить <span>ForwardedSecret "+secret+"</span> в конфиг <span>/usr/local/mgr5/etc/"+panel+".conf</span> и перезапустить панель.";
+                document.getElementById("note").innerHTML = "Don't forget to add <span>ForwardedSecret "+secret+"</span> into file <span>/usr/local/mgr5/etc/"+panel+".conf</span> and restart the panel.";
             }
             else {
-                document.getElementById("config").innerHTML = "Заполнены не все обязательные поля";
+                document.getElementById("config").innerHTML = "Please enter all required fields";
             }
         }
         function copyToClipboard() {
@@ -131,11 +131,11 @@ server {\r\n\
                         <div class="row" style="margin-top:18px;">
                             <div class="input-field col s12">
                                 <input id="domain" name="domain" type="text" placeholder="isp.example.com" class="validate" required>
-                                <label for="domain" class="">Домен*</label>
+                                <label for="domain" class="">Domain*</label>
                             </div>    
                             <div class="input-field col s12">
                                 <input id="alias" name="alias" type="text" placeholder="www.isp.example.com www.isp.example.ru etc..." class="validate">
-                                <label for="alias" class="">Псевдонимы</label>
+                                <label for="alias" class="">Aliases</label>
                             </div>
                             <div class="input-field col s12">
                                 <input id="ip" name="ip" type="text" placeholder="1.1.1.1" class="validate" required>
@@ -143,11 +143,11 @@ server {\r\n\
                             </div>
                             <div class="input-field col s12">
                                 <input id="sslcert" name="sslcert" type="text" placeholder="/var/www/httpd-cert/www-root/isp.example.com.crtca" class="validate" required>
-                                <label for="sslcert" class="">Путь до SSL сертификата*</label>
+                                <label for="sslcert" class="">SSL cert path*</label>
                             </div>
                             <div class="input-field col s12">
                                 <input id="sslkey" name="sslkey" type="text" placeholder="/var/www/httpd-cert/www-root/isp.example.com.key" class="validate" required>
-                                <label for="sslkey" class="">Путь до ключа SSL сертификата*</label>
+                                <label for="sslkey" class="">SSL key path*</label>
                             </div>
                             <div class="input-field col s12">
                                 <select id="panel">
@@ -156,13 +156,13 @@ server {\r\n\
                                     <option value="ipmgr">IPmanager</option>
                                     <option value="dnsmgr">DNSmanager</option>
                                 </select>
-                                <label>Панель управления*</label>
+                                <label>Panel*</label>
                             </div>
                             <div class="input-field col s12">
-                                <button class="waves-effect waves-light btn" onclick="generateConfig()" id="generate">Генерировать
+                                <button class="waves-effect waves-light btn" onclick="generateConfig()" id="generate">Generate
                                 <i class="material-icons right">send</i>
                                 </button>
-                                <button class="waves-effect waves-light btn" onclick="copyToClipboard()" id="copy">Копировать
+                                <button class="waves-effect waves-light btn" onclick="copyToClipboard()" id="copy">Copy
                                 <i class="material-icons right">content_copy</i>
                                 </button>
                             </div>
@@ -174,7 +174,7 @@ server {\r\n\
                 </div>
             </div>
             <div class="col s8">
-                <pre><code class="nginx" id="config">Тут будет сгенерирован конфиг</code></pre>
+                <pre><code class="nginx" id="config">Config will be here</code></pre>
             </div>
         </div>
     <script type="text/javascript" src="js/materialize.min.js"></script>
