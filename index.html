@@ -50,10 +50,10 @@
                 }
                 if (panel == "ispmgr") {
                     var include_fix = "  charset off;\r\n\
-  include /etc/nginx/vhosts-includes/*.conf;\r\n\\";
+  include /etc/nginx/vhosts-includes/*.conf;";
                 }
                 else {
-                    var include_fix = "  charset off;\r\n\\";
+                    var include_fix = "  charset off;";
                 }
                 var config = "server {\r\n\
   server_name "+server_name+";\r\n\
@@ -69,7 +69,7 @@ server {\r\n\
   ssl_prefer_server_ciphers on;\r\n\
   ssl_protocols TLSv1 TLSv1.1 TLSv1.2;\r\n\
   ssl_dhparam /etc/ssl/certs/dhparam4096.pem;\r\n\
-"+include_fix+"
+"+include_fix+"\r\n\
   index index.php index.html;\r\n\
   listen "+ip+":443;\r\n\
   set $mgr_proxy \"https://"+ip+":1500\";\r\n\
