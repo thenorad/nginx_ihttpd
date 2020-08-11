@@ -48,6 +48,13 @@
                 else {
                     var apiv2 = "}";
                 }
+                if (panel == "ispmgr") {
+                    var include_fix = "  charset off;\r\n\
+  include /etc/nginx/vhosts-includes/*.conf;\r\n\";
+                }
+                else {
+                    var include_fix = "  charset off;\r\n\";
+                }
                 var config = "server {\r\n\
   server_name "+server_name+";\r\n\
   listen "+ip+":80;\r\n\
@@ -62,7 +69,7 @@ server {\r\n\
   ssl_prefer_server_ciphers on;\r\n\
   ssl_protocols TLSv1 TLSv1.1 TLSv1.2;\r\n\
   ssl_dhparam /etc/ssl/certs/dhparam4096.pem;\r\n\
-  charset off;\r\n\
+"+include_fix+"
   index index.php index.html;\r\n\
   listen "+ip+":443;\r\n\
   set $mgr_proxy \"https://"+ip+":1500\";\r\n\
@@ -179,10 +186,6 @@ server {\r\n\
         </div>
     <script type="text/javascript" src="js/materialize.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var elems = document.querySelectorAll('.collapsible');
-            var instances = M.Collapsible.init(elems, {accordion: false});
-        });
         document.addEventListener('DOMContentLoaded', function() {
             var elems = document.querySelectorAll('select');
             var instances = M.FormSelect.init(elems);
