@@ -53,7 +53,7 @@
   include /etc/nginx/vhosts-includes/*.conf;\r\n\\";
                 }
                 else {
-                    var include_fix = "  charset off;\r\n\";
+                    var include_fix = "  charset off;\r\n\\";
                 }
                 var config = "server {\r\n\
   server_name "+server_name+";\r\n\
